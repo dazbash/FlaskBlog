@@ -3,6 +3,9 @@
     <words>
       <w>admim</w>
       <w>endblock</w>
+      <w>endfor</w>
+      <w>endwith</w>
+      <w>fram</w>
     </words>
   </dictionary>
 </component>
