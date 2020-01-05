@@ -6,6 +6,7 @@
       <w>endfor</w>
       <w>endwith</w>
       <w>fram</w>
+      <w>tablename</w>
     </words>
   </dictionary>
 </component>

@@ -2,10 +2,10 @@ from flask import session, render_template, request, abort, flash
 from mod_users.forms import LoginForm
 from mod_users.models import User
 from . import admin
-from .utils import protected_view
+from .utils import admin_only_viwe
 
 @admin.route('/')
-@protected_view
+@admin_only_viwe
 def index():
     return "Hello admin index"
 @admin.route('/login/', methods=['GET','POST'])
@@ -20,9 +20,15 @@ def login():
             return render_template('admin/login.html', form=frm)
         if not user.check_password(frm.password.data):
             flash('Incorrect Credentials', category='error')
+            return render_template('admin/login.html', form=frm)
+        if not user.is_admin():
+            flash('Incorrect Credentials', category='error')
+            return render_template('admin/login.html', form=frm)
         session['email']= user.email
         session['user_id']= user.id
+        session['role']= user.role
         return 'login success'
-    if session.get('email') is not None:
+    if session.get('role') == 1:
+        print(session)
         return "you are already logged in"
     return render_template('admin/login.html', form=frm)
