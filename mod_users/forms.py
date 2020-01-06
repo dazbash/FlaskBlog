@@ -10,6 +10,7 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    Full_name = StringField()
+    full_name = StringField()
     email = EmailField(validators= [DataRequired()])
     password = PasswordField(validators= [DataRequired()])
+    confirm_password = PasswordField(validators= [DataRequired()])

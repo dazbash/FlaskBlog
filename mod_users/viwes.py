@@ -1,12 +1,26 @@
-from flask import request, render_template
+from flask import request, render_template, flash
+
+from app import db
 from . import users
 from .forms import RegisterForm
-
+from .models import User
 
 @users.route('/register/', methods= ['GET', 'POST'])
 def register():
-    form = RegisterForm(register.form)
-    if register.method == 'POST':
-        if form.validate_on_submit():
-            pass
-    return render_template('users/register.html', form=form)
+    form = RegisterForm(request.form)
+    if request.method == 'POST':
+        if not form.validate_on_submit():
+            return render_template( 'users/register.html', form=form)
+        if not form.password.data == form.confirm_password.data:
+            error_msg = 'Password and Confirm_password dose not match'
+            form.password.errors.append(error_msg)
+            form.confirm_password.errors.append(error_msg)
+            return render_template('users/register.html', form=form)
+        new_user = User()
+        new_user.full_name = form.full_name.data
+        new_user.email = form.email.data
+        new_user.set_password(form.password.data)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('You created your account successfully.', 'success' )
+    return render_template( 'users/register.html', form=form)
