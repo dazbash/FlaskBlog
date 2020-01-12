@@ -4,6 +4,9 @@ from mod_users.models import User
 from . import admin
 from .utils import admin_only_viwe
 from mod_blog.forms import CreatePostForm
+from mod_blog.models import Post
+from app import db
+from sqlalchemy.exc import IntegrityError
 
 @admin.route('/')
 @admin_only_viwe
@@ -43,10 +46,24 @@ def logout():
     return redirect(url_for('admin.login'))
 
 
-@admin.route('/posts/new/' , methods=['GET', 'POST'])
+@admin.route('/posts/new/', methods=['GET', 'POST'])
 @admin_only_viwe
 def create_post():
     form = CreatePostForm(request.form)
     if request.method == 'POST':
-        pass
-    return render_template('/admin/create_post.html', form=form)
+        if not form.validate_on_submit():
+            return '1'
+        new_post = Post()
+        new_post.title = form.title.data
+        new_post.content = form.content.data
+        new_post.slug = form.slug.data
+        new_post.summary = form.summary.data
+        try:
+            db.session.add(new_post)
+            db.session.commit()
+            flash('Post created!  ')
+            return redirect(url_for('admin.index'))
+        except IntegrityError:
+            db.session.rollback()
+
+    return render_template('admin/create_post.html', form=form)
