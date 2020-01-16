@@ -17,7 +17,7 @@
     {% for user in users  %}
     <tr>
         <td data-label="ID">{{ user.id }}</td>
-        <td data-label="FULLNAME">{{ user.fullname or 'Not specified' }}</td>
+        <td data-label="FULLNAME">{{ user.full_name }}</td>
         <td data-label="EMAIL">{{ user.email }}</td>
         <td data-label="ROLE">{{"Admin" if user.role else 'User' }}</td>
 

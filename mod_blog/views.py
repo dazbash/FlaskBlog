@@ -23,22 +23,22 @@ def single_post(slug):
 @blog.route('/search')
 def search_blog():
     search_form = SearchForm()
-    search_query = request.args.get('q', '')
-    title_cond = Post.title.ilike('{}%'.format(search_query))
-    summary_cond = Post.summary.ilike('{}'.format(search_query))
-    content_cond = Post.content.ilike('{}'.format(search_query))
+    search_query = request.args.get('search_query', '')
+    title_cond = Post.title.ilike('%{}%'.format(search_query))
+    summary_cond = Post.summary.ilike('%{}%'.format(search_query))
+    content_cond = Post.content.ilike('%{}%'.format(search_query))
     found_posts = Post.query.filter(or_(title_cond, summary_cond, content_cond )).all()
     print(found_posts)
     print(search_query)
     print(get_debug_queries())
-    return render_template('blog/index.html', posts=found_posts, search_form=search_form)
+    return render_template('blog/search.html', posts=found_posts, search_form=search_form, search_query=search_query)
 
 
 @blog.route('/category/<string:slug>')
 def single_category(slug):
     search_form = SearchForm()
-    category = Category.query.fiter(Category.slug==slug).first_or_404()
-    return render_template('blog/index.html', posts=category.posts, search_form=search_form)
+    category = Category.query.filter(Category.slug==slug).first_or_404()
+    return render_template('blog/single_category.html', posts=category.posts, search_form=search_form, category_name=category.name)
 
 
 

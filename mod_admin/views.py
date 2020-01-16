@@ -2,11 +2,16 @@ from flask import session, render_template, request, abort, flash, redirect, url
 from mod_users.forms import LoginForm, RegisterForm
 from mod_users.models import User
 from . import admin
+from werkzeug.utils import secure_filename
+import uuid
+
 from .utils import admin_only_viwe
 from mod_blog.forms import PostForm, CategoryForm
 from mod_blog.models import Post, Category
 from app import db
 from sqlalchemy.exc import IntegrityError
+from mod_uploads.forms import FileUploadForm
+from mod_uploads.madels import File
 
 @admin.route('/')
 @admin_only_viwe
@@ -81,7 +86,7 @@ def post_create_user():
     db.session.add(new_user)
     db.session.commit()
     flash('You created your account successfully.', 'success')
-    return render_template('admin/register.html', form=form)
+    return render_template('admin/create_user.html', form=form)
 
 
     # except IntegrityError:
@@ -215,3 +220,25 @@ def modify_category(category_id):
             db.session.rollback()
             flash('Slug Duplicated')
     return render_template('admin/modify_category.html', form=form, category=category)
+
+
+
+@admin.route('/library/upload', methods=['GET', 'POST'])
+@admin_only_viwe
+def upload_file():
+    form = FileUploadForm()
+    if request.method == 'POST':
+        if not form.validate_on_submit():
+            return '1'
+        filename = '{}_{}'.format(uuid.uuid1(), secure_filename(form.file.data.filename))
+        new_file = File()
+        new_file.filename = filename
+        try:
+            db.session.add(new_file)
+            db.session.commit()
+            form.file.data.save('static/uploads/{}'.format(filename))
+            flash('File UPLOADED on {}'.format(url_for("static", filename="uploads/"+filename, _external=True)))
+        except IntegrityError:
+            db.session.rollback()
+            flash('Upload failed', 'error')
+    return render_template('admin/upload_file.html', form=form)
