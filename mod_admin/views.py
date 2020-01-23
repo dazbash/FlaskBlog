@@ -1,17 +1,16 @@
 from flask import session, render_template, request, abort, flash, redirect, url_for
+from werkzeug.utils import secure_filename
+from sqlalchemy.exc import IntegrityError
 from mod_users.forms import LoginForm, RegisterForm
 from mod_users.models import User
-from . import admin
-from werkzeug.utils import secure_filename
-import uuid
-
-from .utils import admin_only_viwe
 from mod_blog.forms import PostForm, CategoryForm
 from mod_blog.models import Post, Category
-from app import db
-from sqlalchemy.exc import IntegrityError
 from mod_uploads.forms import FileUploadForm
-from mod_uploads.madels import File
+from mod_uploads.models import File
+from . import admin
+from .utils import admin_only_viwe
+from app import db
+import uuid
 
 @admin.route('/')
 @admin_only_viwe
